@@ -1,35 +1,55 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import avatar from "../assets/user-avatar.png";
 import styles from "../styles/Username.module.css";
 import extend from "../styles/Profile.module.css";
 import { useFormik } from "formik";
 import { profileValidation } from "../helper/validate";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import convertToBase64 from "../helper/convert";
+import useFetch from "../hooks/fetch.hook";
+import { useAuthStore } from "../store/store";
+import { updateUser } from "../helper/helper";
 
 const Profile = () => {
+  const navigate = useNavigate();
   const [file, setFile] = useState();
+  const username = useAuthStore((state) => state.auth.username);
+  const [{ isLoading, apiData, serverError }] = useFetch(`user/${username}`);
+
   const formik = useFormik({
     initialValues: {
-      first_name: "",
-      last_name: "",
-      email: "kien@duongtrung.com",
-      mobile: "",
-      address: "",
+      firstName: apiData?.firstName || "",
+      lastName: apiData?.lastName || "",
+      email: apiData?.email || "",
+      mobile: apiData?.mobile || "",
+      address: apiData?.address || "",
     },
     validate: profileValidation,
+    enableReinitialize: true,
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (values) => {
-      values = await Object.assign(values, { profile: file || "" });
-      console.log(values);
+      // values = await Object.assign(values, { profile: file || "" });
+      values = { ...values, profile: file || apiData?.profile || "" };
+      let updatePromise = updateUser(values);
+      console.log("🚀 ~ onSubmit: ~ updatePromise:", updatePromise);
+      toast.promise(updatePromise, {
+        loading: "Updating...",
+        success: <b>Updated Successfully</b>,
+        error: <b>Can not Update</b>,
+      });
     },
   });
 
   const onUpload = async (e) => {
     const base64 = await convertToBase64(e.target.files[0]);
     setFile(base64);
+  };
+
+  const handleLogOut = () => {
+    localStorage.removeItem("token");
+    navigate("/");
   };
 
   return (
@@ -50,7 +70,7 @@ const Profile = () => {
             <div className="profile flex justify-center py-4">
               <label htmlFor="profile">
                 <img
-                  src={file || avatar}
+                  src={apiData?.profile || file || avatar}
                   alt="avatar"
                   className={`${styles.profile__img} ${extend.profile}`}
                 />
@@ -66,13 +86,13 @@ const Profile = () => {
             <div className="textbox flex flex-col items-center gap-6">
               <div className="name flex w-3/4 gap-10">
                 <input
-                  {...formik.getFieldProps("first_name")}
+                  {...formik.getFieldProps("firstName")}
                   className={styles.textbox}
                   type="text"
                   placeholder="First Name"
                 />
                 <input
-                  {...formik.getFieldProps("last_name")}
+                  {...formik.getFieldProps("lastName")}
                   className={styles.textbox}
                   type="text"
                   placeholder="Last Name"
@@ -108,9 +128,9 @@ const Profile = () => {
             <div className="text-center py-4">
               <span className="text-gray-500">
                 Comeback Later ?{" "}
-                <Link className="text-red-500" to="/">
+                <button className="text-red-500" onClick={handleLogOut}>
                   Log out
-                </Link>
+                </button>
               </span>
             </div>
           </form>

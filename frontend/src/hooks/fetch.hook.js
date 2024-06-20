@@ -2,9 +2,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { getUsername } from "../helper/helper";
 
-const URL = "http://localhost:8080";
 /** custom hook */
 export default function useFetch(query) {
+  const URL = "http://localhost:8080";
   const [getData, setData] = useState({
     isLoading: false,
     apiData: undefined,
@@ -23,7 +23,7 @@ export default function useFetch(query) {
           ? await axios.get(`${URL}/api/user/${username}`)
           : await axios.get(`${URL}/api/${query}`);
 
-        if (status === 201) {
+        if (status === 200) {
           setData((prev) => ({ ...prev, isLoading: false }));
           setData((prev) => ({ ...prev, apiData: data, status: status }));
         }

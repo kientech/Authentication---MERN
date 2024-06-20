@@ -11,6 +11,8 @@ export default async function Auth(req, res, next) {
     // retrieve the user details for the logged in user
     const decodedToken = await jwt.verify(token, ENV.JWT_SECRET);
     req.user = decodedToken;
+    console.log("🚀 ~ Auth ~ decodedToken:", decodedToken)
+    console.log("🚀 ~ Auth ~ req.user:", req.user);
     next();
   } catch (error) {
     return res.status(500).send({ error: "Authentication Failed" });

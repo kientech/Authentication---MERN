@@ -23,7 +23,10 @@ app.get("/", (req, res) => {
 app.use("/api", router);
 
 // start server
-mongoose.connect("mongodb+srv://duongtrungkien:duongtrungkien@cluster0.dnnugos.mongodb.net/authentication-mern?retryWrites=true&w=majority&appName=Cluster0")
+mongoose
+  .connect(
+    "mongodb+srv://duongtrungkien:duongtrungkien@cluster0.dnnugos.mongodb.net/authentication-mern?retryWrites=true&w=majority&appName=Cluster0"
+  )
   .then(() => {
     try {
       app.listen(port, () => {

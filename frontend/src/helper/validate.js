@@ -13,9 +13,9 @@ function usernameVerify(error = {}, values) {
 function passwordVerify(error = {}, values) {
   const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
   if (!values.password) {
-    error.password = toast.error("Password Required...");
+    error.password = toast.error("Password Required...!");
   } else if (values.password.includes(" ")) {
-    error.password = toast.error("Wrong Password...");
+    error.password = toast.error("Wrong Password...!");
   } else if (values.password.length < 4) {
     error.password = toast.error("Password must be more than 4 characters!");
   } else if (!specialChars.test(values.password)) {
@@ -63,7 +63,7 @@ export async function resetPasswordValidation(values) {
 
 export async function registerValidation(values) {
   const errors = passwordVerify({}, values);
-  passwordValidate(errors, values);
+  passwordVerify(errors, values);
   emailVerify(errors, values);
   return errors;
 }

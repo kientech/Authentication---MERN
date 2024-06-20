@@ -13,7 +13,7 @@ const Username = () => {
 
   const formik = useFormik({
     initialValues: {
-      username: "admin1",
+      username: "",
     },
     validate: usernameValidate,
     validateOnBlur: false,

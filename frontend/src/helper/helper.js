@@ -56,6 +56,7 @@ export async function registerUser(credentials) {
 
     return Promise.resolve(message);
   } catch (error) {
+    console.log("🚀 ~ registerUser ~ error:", error);
     return Promise.reject({ error });
   }
 }
@@ -68,7 +69,7 @@ export async function verifyPassword({ username, password }) {
         username,
         password,
       });
-      return Promise.resolve(data);
+      return Promise.resolve({ data });
     }
   } catch (error) {
     return Promise.reject({ error: "Password doesn't Match...!" });
@@ -80,11 +81,10 @@ export async function updateUser(response) {
   try {
     const token = await localStorage.getItem("token");
     const data = await axios.patch(`${URL}/api/updateUser`, response, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
-    return Promise.resolve(data);
+    console.log("🚀 ~ updateUser ~ data:", data);
+    return Promise.resolve({ data });
   } catch (error) {
     return Promise.reject({ error: "Couldn't Update User Profile...!" });
   }

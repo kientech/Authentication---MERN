@@ -114,24 +114,34 @@ export async function getUser(req, res) {
 
 export async function updateUser(req, res) {
   try {
-    const id = req.query.id;
+    const { userId } = req.user;
+    console.log("🚀 ~ updateUser ~ userId:", userId);
 
-    if (!id) {
-      return res.status(401).send({ error: "User not found" });
+    if (!userId) {
+      return res.status(401).send({ error: "User Not Found...!" });
     }
 
     const body = req.body;
 
-    // Update the user data
-    const result = await UserModel.updateOne({ _id: id }, body);
+    try {
+      const result = await UserModel.updateOne({ _id: userId }, body);
+      if (result.nModified === 0) {
+        return res
+          .status(400)
+          .send({
+            message:
+              "No records updated. The provided data might be identical to existing data.",
+          });
+      }
 
-    if (result.nModified === 0) {
-      return res.status(404).send({ msg: "No changes made to the record" });
+      return res.status(200).send({ message: "Record Updated...!" });
+    } catch (updateError) {
+      console.error("Error updating user record:", updateError);
+      return res.status(500).send({ error: "Failed to update user record." });
     }
-
-    return res.status(200).send({ msg: "Record updated successfully" });
   } catch (error) {
-    return res.status(500).send({ error: error.message });
+    console.error("Unexpected error:", error);
+    return res.status(500).send({ error: "An unexpected error occurred." });
   }
 }
 
